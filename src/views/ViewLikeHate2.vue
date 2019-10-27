@@ -1,7 +1,5 @@
 <template>
   <div id="viewlikehate">
-    <input type="text" placeholder="videoId" v-model="videoId">
-    <button @click="getVideoInfo">불러오기</button>
     <line-chart
       v-if="render"
       :data="data"
@@ -9,6 +7,12 @@
       :width="data.labels.length * 15 < 500 ? 500 : data.labels.length * 15"
       :height="800"
     />
+    <h2>인기동영상에 올라와있던 시간</h2>
+    <div v-if="render" style="display: flex; flex-wrap: wrap;">
+      <div v-for="timeId in popularTime.timeIds" v-bind:key="timeId" style="width: 400px;">
+        {{new Date(captureTime[timeId.timeId])}}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -23,11 +27,11 @@ export default {
   components: {
     LineChart,
   },
+  props: ['videoId'],
   data() {
     return {
-      videoId: 'w-6d6UGD2Lw',
       captureTime: {},
-      videoData: null,
+      popularTime: null,
       render: false,
       data: {
         labels: [],
@@ -63,45 +67,19 @@ export default {
     response.data.forEach((element) => {
       this.captureTime[element.id] = element.time;
     });
-  },
-  methods: {
-    async getVideoInfo() {
-      this.render = false;
-      this.data = {
-        labels: [],
-        datasets: [
-          {
-            label: 'views',
-            backgroundColor: 'red',
-            fill: false,
-            data: [],
-          },
-          {
-            label: 'likes',
-            backgroundColor: 'green',
-            fill: false,
-            data: [],
-          },
-          {
-            label: 'hates',
-            backgroundColor: 'blue',
-            fill: false,
-            data: [],
-          },
-        ],
-      };
-      const response = await axios.get(`${url}/video/change/${this.videoId}`);
-      response.data.forEach((element) => {
-        const tempTime = new Date(this.captureTime[element.timeId]);
-        if (tempTime.getMinutes() === 0 || tempTime.getMinutes() === 30) {
-          this.data.labels.push(tempTime);
-          this.data.datasets[0].data.push(element.views);
-          this.data.datasets[1].data.push(element.likes);
-          this.data.datasets[2].data.push(element.hates);
-        }
-      });
-      this.render = true;
-    },
+    const response2 = await axios.get(`${url}/video/change/${this.videoId}`);
+    response2.data.forEach((element) => {
+      const tempTime = new Date(this.captureTime[element.timeId]);
+      if (tempTime.getMinutes() === 0 || tempTime.getMinutes() === 30) {
+        this.data.labels.push(tempTime);
+        this.data.datasets[0].data.push(element.views);
+        this.data.datasets[1].data.push(element.likes);
+        this.data.datasets[2].data.push(element.hates);
+      }
+    });
+    const response3 = await axios.get(`${url}/video/popularTime/${this.videoId}`);
+    this.popularTime = response3.data;
+    this.render = true;
   },
 };
 </script>

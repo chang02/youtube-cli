@@ -3,8 +3,11 @@
     <div class="category-box" v-for="(value, key) in videos" v-bind:key="key">
       <h1>{{key}}({{value.length}})</h1>
       <div>
-        <span v-for="videoId in value" v-bind:key="videoId">
-          {{videoId}}
+        <span v-for="(videoId, index) in value" v-bind:key="videoId"
+          @click="$router.push(`/viewlikehate2/${videoId}`)"
+          style="cursor:pointer;"
+        >
+          {{index}}. {{videoId}}
         </span>
       </div>
     </div>
@@ -14,7 +17,7 @@
 <script>
 import axios from 'axios';
 
-const url = 'http://101.101.160.176:3000';
+const url = `http://${process.env.VUE_APP_API_URL}:3000`;
 
 export default {
   name: 'videolistpercategory',
