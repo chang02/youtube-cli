@@ -18,7 +18,7 @@
 import axios from 'axios';
 import LineChart from '@/components/LineChart';
 
-const url = 'http://106.10.50.201:3000';
+const url = 'http://101.101.160.176:3000';
 
 export default {
   name: 'viewlikehate',
